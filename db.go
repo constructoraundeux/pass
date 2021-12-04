@@ -116,3 +116,39 @@ func updatePassword(email string, password string) error {
 
 	return nil
 }
+
+// createAdmin creates a new user account with role `admin`.
+func createAdmin(name, email, password string) error {
+	hashed, err := hash(password)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Error encriptando la password:\n%s", err.Error()))
+	}
+
+	query := `
+		insert into users (name, email, password, role)
+		values ($1, $2, $3, 'admin')
+	`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	db, err := openDB()
+	if err != nil {
+		return errors.New(fmt.Sprintf("Error conectando a la base de datos:\n%s", err.Error()))
+	}
+
+	result, err := db.ExecContext(ctx, query, name, email, hashed)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Error actualizando la base de datos:\n%s", err.Error()))
+	}
+
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return errors.New(fmt.Sprintf("Error actualizando la base de datos:\n%s", err.Error()))
+	}
+	if affected != 1 {
+		return errors.New(fmt.Sprintf("No se actualizó ninguna cuenta (Rows affected: %d)", affected))
+	}
+
+	return nil
+}

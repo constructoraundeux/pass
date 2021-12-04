@@ -12,9 +12,16 @@ func init() {
 	_ = godotenv.Load(".env")
 }
 
+const (
+	cmdChangePassword = "Cambiar password"
+	cmdListUsers      = "Listar usuarios"
+	cmdCreateAdmin    = "Crear admin"
+	cmdExit           = "Salir"
+)
+
 var operationsPrompt = &survey.Select{
 	Message: "Qué operación querés realizar?:",
-	Options: []string{"Cambiar password", "Listar usuarios", "Salir"},
+	Options: []string{cmdChangePassword, cmdListUsers, cmdCreateAdmin, cmdExit},
 	Default: "Cambiar password",
 }
 
@@ -25,14 +32,17 @@ func main() {
 	safe(survey.AskOne(operationsPrompt, &op))
 
 	switch op {
-	case "Salir":
+	case cmdExit:
 		info("Hasta luego")
 		os.Exit(0)
-	case "Listar usuarios":
+	case cmdListUsers:
 		handleListUsers()
 		os.Exit(0)
-	case "Cambiar password":
+	case cmdChangePassword:
 		handlePasswordChange()
+		os.Exit(0)
+	case cmdCreateAdmin:
+		handleCreateAdmin()
 		os.Exit(0)
 	default:
 		out(fmt.Sprintf("Operación %q no soportada. Nos vimos.", op))

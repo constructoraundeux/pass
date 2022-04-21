@@ -2,8 +2,8 @@ name: Publish Latest Draft Release
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 jobs:
   publish:

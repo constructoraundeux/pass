@@ -1,4 +1,4 @@
-name: Create Release
+name: Build And Release
 
 on:
   push:
@@ -6,28 +6,39 @@ on:
       - 'v*'
 
 jobs:
-  create_release:
-    name: Create Release
+  build:
+    name: Release Go Binary
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [linux, windows]
+        goarch: [amd64]
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Read release.json
-      uses: notiz-dev/github-action-json-property@release
-      id: package_info
+      uses: actions/checkout@master
+    - name: Build
+      uses: wangyoucao577/go-release-action@v1.28
       with:
-        path: 'release.json'
-        prop_path: 'version'
-
-    - name: Show Version Number
-      run: echo "Version is ${{ steps.package_info.outputs.prop }}"
-
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goos: ${{ matrix.goos }}
+        goarch: ${{ matrix.goarch }}
+        binary_name: "undeuxpass"
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
     - name: Create release
-      id: create_release
-      uses: actions/create-release@v1
+      uses: Roang-zero1/github-create-release-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifacts
+      uses: Roang-zero1/github-upload-release-artifacts-action@master
       with:
-        tag_name: "v${{ steps.package_info.outputs.prop }}"
-        release_name: Release v${{ steps.package_info.outputs.prop }}
+        args:
+        - bin/linux/undeux
+        - bin/windows/undeux.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

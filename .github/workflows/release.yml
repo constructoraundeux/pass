@@ -16,17 +16,20 @@ jobs:
           fetch-depth: 0
       - name: build
         run: make build
-      # - name: version
-      #   id: version
-      #   run: echo "::set-output name=version::$(./bin/azblogfilter -version)"
+      - name: get version from release.json
+        uses: notiz-dev/github-action-json-property@release
+        id: version
+        with:
+          path: 'release.json'
+          prop_path: 'version'
       - name: release
         id: create_release
         uses: actions/create-release@v1
         with:
           draft: false
           prerelease: false
-          release_name: v0.1.4
-          tag_name: v0.1.4
+          release_name: ${{ steps.version.outputs.prop }}
+          tag_name: ${{ steps.version.outputs.prop }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: upload linux artifact

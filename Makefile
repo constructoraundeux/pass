@@ -16,6 +16,7 @@ release/patch:
 	git tag ${NEW_PATCH}
 	git commit -am 'Set version ${NEW_PATCH}'
 	git push origin main
+	sleep 3
 	git push --tags
 
 .PHONY: release/minor
@@ -25,6 +26,7 @@ release/minor:
 	git tag ${NEW_MINOR}
 	git commit -am 'Set version ${NEW_MINOR}'
 	git push origin main
+	sleep 3
 	git push --tags
 
 .PHONY: release/major
@@ -34,4 +36,6 @@ release/major:
 	git tag ${NEW_MAJOR}
 	git commit -am 'Set version ${NEW_MAJOR}'
 	git push origin main
+	sleep 3
 	git push --tags
+
